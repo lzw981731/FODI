@@ -1,0 +1,7 @@
+# dependency
+node_modules
+
+# wrangler
+.dev.vars
+.wrangler
+worker.d.ts
