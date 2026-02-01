@@ -35,7 +35,7 @@
       // 展示路径（空值=全盘），否则按 '/媒体/音乐' 的格式填写
       "EXPOSE_PATH": "",
       // Require authentication for all paths | 是否对所有路径启用鉴权
-      "REQUIRE_AUTH": false,
+      "REQUIRE_AUTH": true,
       // If authentication is enabled, the filename to store passwords, passwords are in sha256 hex format
       // 开启鉴权后生效，用于存放密码的文件名，密码为 sha256 hex 格式
       "PASSWD_FILENAME": ".password",
