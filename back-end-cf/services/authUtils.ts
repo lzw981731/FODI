@@ -3,36 +3,42 @@ import { downloadFile } from './fileMethods';
 import type { TokenScope } from '../types/apiType';
 
 async function authenticatePost(env: Env, path: string, passwd?: string): Promise<boolean> {
-  // empty input password, improve loading speed
-  if (!passwd) {
-    return false;
-  }
+  // normalize path to remove trailing slash except for root
+  const normPath = path === '/' ? '' : (path.endsWith('/') ? path.slice(0, -1) : path);
 
-  // check env password
-  if (env.PASSWORD && secureEqual(passwd, env.PASSWORD)) {
+  // 1. check env password (global)
+  if (env.PASSWORD && passwd && secureEqual(passwd, env.PASSWORD)) {
     return true;
   }
 
   // check password files in onedrive
   const hashedPasswd = await sha256(passwd || '');
   const candidatePaths = new Set<string>();
-  candidatePaths.add(path === '/' ? '' : path);
-  candidatePaths.add('');
+  candidatePaths.add(normPath);
+  candidatePaths.add(''); // back-compat for root
 
   const downloads = await Promise.all(
-    Array.from(candidatePaths).map((p) =>
-      downloadFile(`${p}/${env.PROTECTED.PASSWD_FILENAME}`, true).then((resp) =>
+    Array.from(candidatePaths).map((p) => {
+      const fullPath = `${p}/${env.PROTECTED.PASSWD_FILENAME}`.replace(/\/+/g, '/');
+      return downloadFile(fullPath, true).then((resp) =>
         resp.status === 404 ? undefined : resp.text(),
-      ),
-    ),
+      );
+    }),
   );
 
+  let hasPasswordFile = false;
   for (const pwFileContent of downloads) {
-    if (pwFileContent && secureEqual(hashedPasswd, pwFileContent.toLowerCase())) {
-      return true;
+    if (pwFileContent !== undefined) {
+      hasPasswordFile = true;
+      if (passwd && secureEqual(hashedPasswd, pwFileContent.trim().toLowerCase())) {
+        return true;
+      }
     }
   }
-  return downloads.every((content) => content === undefined);
+
+  // If ANY candidate path has a password file, but no password matched, auth fails.
+  // If NO candidate path has a password file, auth succeeds (public folder).
+  return !hasPasswordFile;
 }
 
 export function authenticateWebdav(
