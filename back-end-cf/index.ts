@@ -6,7 +6,9 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === '/d.html') {
-      return env.ASSETS.fetch(request);
+      const newUrl = new URL(request.url);
+      newUrl.pathname = '/d';
+      return env.ASSETS.fetch(new Request(newUrl.toString(), request));
     }
 
     try {
