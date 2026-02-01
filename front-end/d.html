@@ -1636,8 +1636,7 @@
               previewHandler.copyTextContent(
                 null,
                 (() => {
-                  const u = new URL(window.location.protocol + window.api.url);
-                  u.searchParams.set('file', path);
+                  const u = new URL(window.location.protocol + '//' + window.location.host + path);
                   return u.toString();
                 })(),
               );
