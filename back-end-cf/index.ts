@@ -11,10 +11,6 @@ export default {
       return env.ASSETS.fetch(new Request(newUrl.toString(), request));
     }
 
-    if (url.pathname === '/deployfodi') {
-      return cacheRequest(request, env, ctx);
-    }
-
     try {
       return cacheRequest(request, env, ctx);
     } catch (e: any) {
