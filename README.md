@@ -1,4 +1,4 @@
-# FODI
+## FODI
 
 Fast OneDrive Index / FODI，无需服务器的 OneDrive 快速列表程序。
 
