@@ -8,11 +8,17 @@ export default {
     const indexFile = env.PROTECTED.INDEX_FILENAME || 'd.html';
     const indexBase = indexFile.replace(/\.html$/, '');
 
-    // 如果访问的是列表页路径（如 /c.html 或 /c）
-    if (url.pathname === `/${indexFile}` || url.pathname === `/${indexBase}`) {
-      // 内部读取 index.html，但保持浏览器地址栏不变
+    // 允许的列表页路径：自定义路径 + 永久保留的 d.html 路径
+    const isListingPage =
+      url.pathname === `/${indexFile}` ||
+      url.pathname === `/${indexBase}` ||
+      url.pathname === '/d.html' ||
+      url.pathname === '/d';
+
+    if (isListingPage) {
       const assetUrl = new URL(request.url);
-      assetUrl.pathname = '/index.html';
+      // 物理文件重命名为 app.html 以避开 Cloudflare 对 index.html 的自动重定向（Pretty URLs）
+      assetUrl.pathname = '/app.html';
       return env.ASSETS.fetch(new Request(assetUrl.toString(), request));
     }
 
