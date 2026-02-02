@@ -9,16 +9,8 @@ export async function handleGetRequest(
   requestUrl: URL,
 ): Promise<Response> {
   // display deployment
-  const indexFile = env.PROTECTED.INDEX_FILENAME || 'd.html';
-  const indexBase = indexFile.replace(/\.html$/, '');
-
   if (requestUrl.pathname === '/deployfodi') {
     return renderDeployHtml(env, requestUrl);
-  }
-
-  // 如果访问的是列表页路径，简单返回一个标志，防止后端去 OneDrive 找存这个名字的文件
-  if (requestUrl.pathname === `/${indexFile}` || requestUrl.pathname === `/${indexBase}`) {
-    return new Response('FODI Engine Active', { headers: { 'Content-Type': 'text/plain' } });
   }
 
   // download files
