@@ -3,42 +3,43 @@ import { downloadFile } from './fileMethods';
 import type { TokenScope } from '../types/apiType';
 
 async function authenticatePost(env: Env, path: string, passwd?: string): Promise<boolean> {
-  // normalize path to remove trailing slash except for root
   const normPath = path === '/' ? '' : (path.endsWith('/') ? path.slice(0, -1) : path);
+  const pathParts = normPath.split('/').filter(Boolean);
 
-  // 1. check env password (global)
   if (env.PASSWORD && passwd && secureEqual(passwd, env.PASSWORD)) {
     return true;
   }
 
-  // check password files in onedrive
+  const candidatePaths: string[] = [];
+  let current = '';
+  candidatePaths.push('');
+  for (const part of pathParts) {
+    current += '/' + part;
+    candidatePaths.push(current);
+  }
+  candidatePaths.reverse();
+
   const hashedPasswd = await sha256(passwd || '');
-  const candidatePaths = new Set<string>();
-  candidatePaths.add(normPath);
-  candidatePaths.add(''); // back-compat for root
 
-  const downloads = await Promise.all(
-    Array.from(candidatePaths).map((p) => {
-      const fullPath = `${p}/${env.PROTECTED.PASSWD_FILENAME}`.replace(/\/+/g, '/');
-      return downloadFile(fullPath, true).then((resp) =>
-        resp.status === 404 ? undefined : resp.text(),
-      );
-    }),
-  );
+  for (const p of candidatePaths) {
+    const fullPath = `${p}/${env.PROTECTED.PASSWD_FILENAME}`.replace(/\/+/g, '/');
+    const resp = await downloadFile(fullPath, true);
 
-  let hasPasswordFile = false;
-  for (const pwFileContent of downloads) {
-    if (pwFileContent !== undefined) {
-      hasPasswordFile = true;
-      if (passwd && secureEqual(hashedPasswd, pwFileContent.trim().toLowerCase())) {
-        return true;
+    if (resp.status === 200 || resp.status === 302) {
+      const pwFileContent = await resp.text();
+      const trimmedContent = pwFileContent.trim().toLowerCase();
+
+      if (trimmedContent.length > 0) {
+        if (passwd && secureEqual(hashedPasswd, trimmedContent)) {
+          return true;
+        } else {
+          return false;
+        }
       }
     }
   }
 
-  // If ANY candidate path has a password file, but no password matched, auth fails.
-  // If NO candidate path has a password file, auth succeeds (public folder).
-  return !hasPasswordFile;
+  return true;
 }
 
 export function authenticateWebdav(
@@ -137,6 +138,7 @@ export async function authorizeActions(
         break;
 
       case 'list':
+        // For list action, we ALWAYS check for .password files regardless of REQUIRE_AUTH
         ok = await authenticatePost(env, path, passwd);
         break;
 
