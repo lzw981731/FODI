@@ -43,7 +43,7 @@
       // 2) If the request domain contains `{keyword}.example`, WebDAV GET responses will be cached
       // 1）设置后可通过 worker 代理下载文件，例如 example.com/{keyword}/file
       // 2）当请求域名包含 `{keyword}.example` 时，WebDAV GET 响应将启用缓存
-      "PROXY_KEYWORD": ""
+      "PROXY_KEYWORD": "https://dd.vipkj.workers.dev/"
     },
     // Method-based cache TTL (seconds) | 请求方法缓存时长（秒）
     // during this period, the OneDrive API will not be called again | 期间不再调用OneDrive API
