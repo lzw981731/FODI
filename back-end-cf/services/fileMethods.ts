@@ -35,8 +35,8 @@ export async function fetchFiles(
     files: children
       .map((file) => {
         let url = file['@microsoft.graph.downloadUrl'];
-        if (runtimeEnv.PROTECTED.PROXY_KEYWORD && url) {
-          const proxyKeyword = runtimeEnv.PROTECTED.PROXY_KEYWORD;
+        const proxyKeyword = (runtimeEnv as any).PROXY_KEYWORD || runtimeEnv.PROTECTED.PROXY_KEYWORD;
+        if (proxyKeyword && url) {
           if (proxyKeyword.startsWith('http')) {
             // If it's a full URL, we extract the path from the original download URL
             // and prepend the proxy base.

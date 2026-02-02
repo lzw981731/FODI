@@ -21,6 +21,7 @@ declare global {
       PROXY_KEYWORD: string;
       INDEX_FILENAME: string;
     };
+    PROXY_KEYWORD?: string; // 支持作为 Secret 或环境变量直接设置
     CACHE_TTLMAP: {
       GET: number;
       POST: number;

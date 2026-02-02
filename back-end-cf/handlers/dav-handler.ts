@@ -18,18 +18,25 @@ export async function handleWebdav(request: Request, env: Env, requestUrl: URL):
     });
   }
 
+  const proxyKeyword = env.PROXY_KEYWORD || env.PROTECTED.PROXY_KEYWORD;
+  const isUrlProxy = proxyKeyword.startsWith('http');
+  const proxyPrefix = isUrlProxy ? new URL(proxyKeyword).pathname : `/${proxyKeyword}`;
+
   const isProxyRequest = !!(
-    env.PROTECTED.PROXY_KEYWORD &&
-    requestUrl.pathname.startsWith(`/${env.PROTECTED.PROXY_KEYWORD}`)
+    proxyKeyword &&
+    (isUrlProxy
+      ? requestUrl.href.startsWith(proxyKeyword)
+      : requestUrl.pathname.startsWith(proxyPrefix))
   );
+
   const filePath = parsePath(
     decodeURIComponent(requestUrl.pathname),
-    isProxyRequest ? `/${env.PROTECTED.PROXY_KEYWORD}` : undefined,
+    isProxyRequest ? proxyPrefix : undefined,
     true,
   ).path;
   const destination = parsePath(
     decodeURIComponent(request.headers.get('Destination') || ''),
-    isProxyRequest ? `/${env.PROTECTED.PROXY_KEYWORD}` : undefined,
+    isProxyRequest ? proxyPrefix : undefined,
     true,
   ).path;
 
@@ -60,7 +67,7 @@ function handleDavRes(davRes: DavRes, isProxyRequest: boolean) {
 
   let davXml = davRes.davXml;
   if (isProxyRequest && davXml) {
-    const keyword = runtimeEnv.PROTECTED.PROXY_KEYWORD;
+    const keyword = (runtimeEnv as any).PROXY_KEYWORD || runtimeEnv.PROTECTED.PROXY_KEYWORD;
     const prefix = keyword.startsWith('http') ? keyword : `/${keyword}`;
     davXml = davXml.replaceAll('<d:href>', `<d:href>${prefix}`);
   }
