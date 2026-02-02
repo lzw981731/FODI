@@ -10,7 +10,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === `/${indexFile}` || url.pathname === `/${indexBase}`) {
       const newUrl = new URL(request.url);
-      newUrl.pathname = `/${indexBase}`;
+      newUrl.pathname = `/${indexFile}`;
       return env.ASSETS.fetch(new Request(newUrl.toString(), request));
     }
 
