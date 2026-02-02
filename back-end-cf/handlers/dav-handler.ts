@@ -18,9 +18,10 @@ export async function handleWebdav(request: Request, env: Env, requestUrl: URL):
     });
   }
 
-  const isProxyRequest =
+  const isProxyRequest = !!(
     env.PROTECTED.PROXY_KEYWORD &&
-    requestUrl.pathname.startsWith(`/${env.PROTECTED.PROXY_KEYWORD}`);
+    requestUrl.pathname.startsWith(`/${env.PROTECTED.PROXY_KEYWORD}`)
+  );
   const filePath = parsePath(
     decodeURIComponent(requestUrl.pathname),
     isProxyRequest ? `/${env.PROTECTED.PROXY_KEYWORD}` : undefined,
@@ -57,10 +58,12 @@ function handleDavRes(davRes: DavRes, isProxyRequest: boolean) {
     ...(davRes.davHeaders || {}),
   };
 
-  const davXml =
-    isProxyRequest && davRes.davXml
-      ? davRes.davXml.replaceAll('<d:href>', `<d:href>/${runtimeEnv.PROTECTED.PROXY_KEYWORD}`)
-      : davRes.davXml;
+  let davXml = davRes.davXml;
+  if (isProxyRequest && davXml) {
+    const keyword = runtimeEnv.PROTECTED.PROXY_KEYWORD;
+    const prefix = keyword.startsWith('http') ? keyword : `/${keyword}`;
+    davXml = davXml.replaceAll('<d:href>', `<d:href>${prefix}`);
+  }
 
   return { davXml, davStatus: davRes.davStatus, davHeaders };
 }

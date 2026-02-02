@@ -1,8 +1,29 @@
 declare global {
   interface Env {
-    FODI_CACHE?: KVNamespace;
-    USERNAME?: string;
-    PASSWORD?: string;
+    ASSETS: { fetch: typeof fetch };
+    FODI_CACHE: any;
+    USERNAME: string;
+    PASSWORD: string;
+    OAUTH: {
+      clientId: string;
+      clientSecret: string;
+      redirectUri: string;
+      loginHost: string;
+      oauthUrl: string;
+      apiHost: string;
+      apiUrl: string;
+      scope: string;
+    };
+    PROTECTED: {
+      EXPOSE_PATH: string;
+      REQUIRE_AUTH: boolean;
+      PASSWD_FILENAME: string;
+      PROXY_KEYWORD: string;
+    };
+    CACHE_TTLMAP: {
+      GET: number;
+      POST: number;
+    };
   }
 }
 

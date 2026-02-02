@@ -14,12 +14,20 @@ export async function handleGetRequest(
   }
 
   // download files
-  const isProxyRequest =
-    env.PROTECTED.PROXY_KEYWORD &&
-    requestUrl.pathname.startsWith(`/${env.PROTECTED.PROXY_KEYWORD}`);
+  const proxyKeyword = env.PROTECTED.PROXY_KEYWORD;
+  const isUrlProxy = proxyKeyword.startsWith('http');
+  const proxyPrefix = isUrlProxy ? new URL(proxyKeyword).pathname : `/${proxyKeyword}`;
+
+  const isProxyRequest = !!(
+    proxyKeyword &&
+    (isUrlProxy
+      ? requestUrl.href.startsWith(proxyKeyword)
+      : requestUrl.pathname.startsWith(proxyPrefix))
+  );
+
   const { path: filePath, tail: fileName } = parsePath(
     requestUrl.searchParams.get('file') || decodeURIComponent(requestUrl.pathname),
-    isProxyRequest ? `/${env.PROTECTED.PROXY_KEYWORD}` : undefined,
+    isProxyRequest ? proxyPrefix : undefined,
   );
 
   if (!fileName) {

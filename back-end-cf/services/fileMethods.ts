@@ -33,12 +33,28 @@ export async function fetchFiles(
     skipToken,
     orderby,
     files: children
-      .map((file) => ({
-        name: file.name,
-        size: file.size,
-        lastModifiedDateTime: file.lastModifiedDateTime,
-        url: file['@microsoft.graph.downloadUrl'],
-      }))
+      .map((file) => {
+        let url = file['@microsoft.graph.downloadUrl'];
+        if (runtimeEnv.PROTECTED.PROXY_KEYWORD && url) {
+          const proxyKeyword = runtimeEnv.PROTECTED.PROXY_KEYWORD;
+          if (proxyKeyword.startsWith('http')) {
+            // If it's a full URL, we extract the path from the original download URL
+            // and prepend the proxy base.
+            const originalUrl = new URL(url);
+            const proxyBase = proxyKeyword.endsWith('/') ? proxyKeyword.slice(0, -1) : proxyKeyword;
+            url = `${proxyBase}${originalUrl.pathname}${originalUrl.search}`;
+          } else {
+            const filePath = (parent === '/' ? '' : parent) + '/' + file.name;
+            url = `/${proxyKeyword}${filePath}`;
+          }
+        }
+        return {
+          name: file.name,
+          size: file.size,
+          lastModifiedDateTime: file.lastModifiedDateTime,
+          url: url,
+        };
+      })
       .filter((file) => file.name !== runtimeEnv.PROTECTED.PASSWD_FILENAME),
   };
 }
