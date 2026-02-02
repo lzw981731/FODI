@@ -120,14 +120,16 @@ export async function authorizeActions(
   const tokenScopes = await getTokenScopes(env.PASSWORD, path, url.searchParams);
 
   for (const action of actions) {
-    if (env.PROTECTED.REQUIRE_AUTH !== true && publicActions.includes(action)) {
-      allowed.add(action);
-      continue;
-    }
+    if (action !== 'list') {
+      if (env.PROTECTED.REQUIRE_AUTH !== true && publicActions.includes(action)) {
+        allowed.add(action);
+        continue;
+      }
 
-    if (tokenScopes.includes(action)) {
-      allowed.add(action);
-      continue;
+      if (tokenScopes.includes(action)) {
+        allowed.add(action);
+        continue;
+      }
     }
 
     let ok = false;
