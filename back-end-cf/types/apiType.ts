@@ -19,6 +19,7 @@ declare global {
       REQUIRE_AUTH: boolean;
       PASSWD_FILENAME: string;
       PROXY_KEYWORD: string;
+      INDEX_FILENAME: string;
     };
     CACHE_TTLMAP: {
       GET: number;

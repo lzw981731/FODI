@@ -5,9 +5,10 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
 
-    if (url.pathname === '/d.html') {
+    const indexFile = env.PROTECTED.INDEX_FILENAME || 'd.html';
+    if (url.pathname === `/${indexFile}`) {
       const newUrl = new URL(request.url);
-      newUrl.pathname = '/d';
+      newUrl.pathname = `/${indexFile}`;
       return env.ASSETS.fetch(new Request(newUrl.toString(), request));
     }
 
