@@ -8,11 +8,12 @@ export default {
     const indexFile = env.PROTECTED.INDEX_FILENAME || 'd.html';
     const indexBase = indexFile.replace(/\.html$/, '');
 
-    // 只有在明确访问列表页路径（如 /c.html 或 /c）时，才返回物理 index.html
+    // 如果访问的是列表页路径（如 /c.html 或 /c）
     if (url.pathname === `/${indexFile}` || url.pathname === `/${indexBase}`) {
-      const newUrl = new URL(request.url);
-      newUrl.pathname = '/index.html';
-      return env.ASSETS.fetch(new Request(newUrl.toString(), request));
+      // 内部读取 index.html，但保持浏览器地址栏不变
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname = '/index.html';
+      return env.ASSETS.fetch(new Request(assetUrl.toString(), request));
     }
 
     // 访问根目录 / 或其他路径，交回给后端的逻辑处理（保持原汁原味）
