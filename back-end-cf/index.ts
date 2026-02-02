@@ -6,9 +6,11 @@ export default {
     const url = new URL(request.url);
 
     const indexFile = env.PROTECTED.INDEX_FILENAME || 'd.html';
-    if (url.pathname === `/${indexFile}`) {
+    const indexBase = indexFile.replace(/\.html$/, '');
+
+    if (url.pathname === '/' || url.pathname === `/${indexFile}` || url.pathname === `/${indexBase}`) {
       const newUrl = new URL(request.url);
-      newUrl.pathname = `/${indexFile}`;
+      newUrl.pathname = `/${indexBase}`;
       return env.ASSETS.fetch(new Request(newUrl.toString(), request));
     }
 
