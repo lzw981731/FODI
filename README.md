@@ -1,6 +1,6 @@
 # FODI
 
-Fast OneDrive Index / FODI，无需服务器的 OneDrive 快速列表程序
+Fast OneDrive Index / FODI，无需服务器的 OneDrive 快速列表程序。
 
 ## 预览
 
@@ -12,109 +12,79 @@ Fast OneDrive Index / FODI，无需服务器的 OneDrive 快速列表程序
 - 特定文件夹加密
 - 无需服务器免费部署
 - 基本文本、图片、音视频和 Office 三件套预览
+- **支持 WebDAV** (列表, 上传, 下载, 复制, 移动)
 
-## 缺点
+## 部署方案
 
-- 功能简单，界面简陋
-- 不支持巨硬家的 IE 和 UWP 版 EDGE 浏览器
-
-## 部署
-
-### 一键部署
+### 1. 一键部署 (推荐个人版用户)
 
 > [!CAUTION]
-> Supported only for personal accounts; use alternatives for other types account. Creating your own app is recommended.<br>
-> 仅支持个人版，其他版本请使用替代部署方案，建议自行创建应用。
+> 仅支持个人版账号。建议自行创建应用以获得更稳定的体验。
 
-1. [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/vcheckzen/FODI)
-2. 访问域名加上 `/deployfodi`
+1. 点击按钮一键部署到 Cloudflare Workers:
+   [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/lzw981731/FODI)
+2. 部署完成后，访问 `https://your-worker.workers.dev/deployfodi` 进行 OneDrive 授权。
+3. 授权成功后即可访问主页。
 
-> [!NOTE]
-> 更新仓库后需获取 [kv_namespaces id](https://dash.cloudflare.com/?to=/:account/workers/kv/namespaces) 填入 `wrangler.jsonc`
-
-### 在线导入
-
-1. [把项目导入到自己 Github 的私有仓库](https://docs.github.com/en/migrations/importing-source-code/using-github-importer/importing-a-repository-with-github-importer#importing-a-repository-with-github-importer)
-2. 编辑 `wrangler.jsonc` 并提交修改
-3. [从 Cloudflare 控制台导入你的 Github 仓库](https://dash.cloudflare.com/?to=/:account/workers-and-pages/create)
-
-<details>
-    <summary>或者</summary>
-
-### 命令推送
+### 2. 命令行部署 (适用于开发与进阶用户)
 
 ```sh
-git clone https://github.com/vcheckzen/FODI.git
+git clone https://github.com/lzw981731/FODI.git
 cd FODI
-# edit wrangler.jsonc, then
-npm i wrangler
+
+# 1. 安装依赖
+npm install
+
+# 2. 配置 KV (可选但建议)
+# 在控制台创建一个 KV Namespace 并将 ID 填入 wrangler.jsonc 的 kv_namespaces 部分
+
+# 3. 部署
 npm run deploy
-# webdav config
+
+# 4. 初始化
+# 访问 https://your-worker.workers.dev/deployfodi 进行授权
+```
+
+### 3. EdgeOne 加速
+
+如果您希望在腾讯云 EdgeOne 上部署前端部分以获得国内更好的访问速度：
+
+[![使用 EdgeOne Pages 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2Flzw981731%2FFODI%2Ftree%2Fmaster%2Ffront-end)
+
+## 配置说明
+
+### 环境参数 (`wrangler.jsonc` 中的 `vars`)
+
+您可以直接修改 `wrangler.jsonc` 或在 Cloudflare 控制台设置变量。
+
+| 变量名 | 描述 | 默认值/示例 |
+| :--- | :--- | :--- |
+| `INDEX_FILENAME` | 前端主页的文件名（逻辑映射）。 | `"c.html"` |
+| `EXPOSE_PATH` | 展示的起始目录。留空表示全盘展示。 | `"/Media"` |
+| `REQUIRE_AUTH` | 是否开启全站强制登录。 | `false` |
+| `PASSWD_FILENAME` | 存放文件夹密码的文件名（sha256 格式）。 | `".password"` |
+| `PROXY_KEYWORD` | 代理下载的 URL 或关键词。**Secret 优先级最高**。 | `"https://proxy.example.com/"` |
+
+### 安全性与 Secret 设置
+
+对于敏感信息，建议通过 `wrangler secret` 命令设置：
+
+```sh
+# 设置 WebDAV 凭据
 npx wrangler secret put USERNAME
 npx wrangler secret put PASSWORD
+
+# 设置全局代理下载地址（覆盖配置文件）
+npx wrangler secret put PROXY_KEYWORD
 ```
 
-</details>
+## WebDAV 使用说明
 
-### EdgeOne 加速
+FODI 支持基本的 WebDAV 协议。
+- **地址**: `https://your-worker.workers.dev/`
+- **账号/密码**: 通过上述 `wrangler secret` 设置的 `USERNAME` 和 `PASSWORD`。
 
-[![使用 EdgeOne Pages 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2Fvcheckzen%2FFODI%2Ftree%2Fmaster%2Ffront-end)
+## 更新日志
 
-<details>
-    <summary>其它事项</summary>
-
-## 配置
-
-### 加密
-
-- 方式 1：在自定义的密码文件中填入 sha256 后的哈希值
-- 方式 2：环境变量 `PASSWORD` 的值
-
-### WEBDAV
-
-- 账号密码设置: 在 **变量和机密** 设置 **秘钥**，变量名为 `USERNAME` 与 `PASSWORD`
-- 文件上传限制: FreePlan 100MB, BusinessPlan 200MB, EnterprisePlan 500MB
-
-### 预览
-
-- pdf: 如果需要使用本地 pdf 预览，请前往 [PDF.js](https://mozilla.github.io/pdf.js/) 下载文件并解压命名为 `pdfjs` ，注释掉 `viewer.mjs` 的 `fileOrigin !== viewerOrigin` 条件，并修改 `//mozilla.github.io/pdf.js/web/viewer.html?file=`
-- markdown: 网页在 `Optional Markdown extensions` 可选择是否启用 github alert 与 katex 格式
-
-### 下载
-
-- 通过 `PROXY_KEYWORD` 访问可让 worker 代理
-- 访问 `https://example.com/a.html?format=` 可添加转换的目标格式，[支持转换格式](https://learn.microsoft.com/zh-cn/onedrive/developer/rest-api/api/driveitem_get_content_format?view=odsp-graph-online#format-options)
-
-### 参数
-
-1. `path`: 前端（非特别注明皆为后端），前端起始目录
-2. `token`: 访问令牌，格式为 HMAC-SHA256 后的 `path,ts,te`
-3. `ts`: 访问令牌可选参数，token 权限，`download,refresh,list,upload,children,recursive`， 不填默认下载
-4. `te`: 访问令牌可选参数，token 失效日期，格式为 uninx timestamp (单位 s)， 不填默认永久
-5. `tb`: 访问令牌可选参数，token 作用起始目录，搭配 `recursive` 权限使用
-6. `format`: 下载时转换源文件为format格式，[支持格式](#下载)
-7. `file`: 下载文件地址，`/a/a.txt`
-
-> 例: 想下载/Abc/a.txt，密码为 123456，路径 /Abc，过期时间 1735660800(2025-01-01 00:00:00)
-> `/Abc,download,1735660800` 经 HMAC-SHA256 得到 `https://example.com/Abc/a.txt?token=b5b0b5e80533c614dc78b968685d3467f93e63a6e596cb12ffce6ff38007e034&te=1735660800&format=pdf`
-
-## 开发
-
-```sh
-pnpm i
-# edit wrangler.jsonc, then
-npm run type
-npm run dev
-```
-
-## 更新
-
-### 2025.02.12
-
-- 实现部分 Webdav 功能（列表，上传，下载，复制，移动）
-
-### 2024.09.15
-
-- 支持上传（在上传目录创建 `.upload` 文件）
-
-</details>
+- **2025.02.12**: 实现部分 WebDAV 功能。
+- **2024.09.15**: 支持上传功能（需在目录创建 `.upload` 文件）。
