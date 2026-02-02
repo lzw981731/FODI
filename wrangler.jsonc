@@ -45,7 +45,7 @@
       // 2）当请求域名包含 `{keyword}.example` 时，WebDAV GET 响应将启用缓存
       "PROXY_KEYWORD": "https://dd.vipkj.workers.dev/",
       // Main frontend filename | 前端主文件名
-      "INDEX_FILENAME": "d.html"
+      "INDEX_FILENAME": "c.html"
     },
     // Method-based cache TTL (seconds) | 请求方法缓存时长（秒）
     // during this period, the OneDrive API will not be called again | 期间不再调用OneDrive API
