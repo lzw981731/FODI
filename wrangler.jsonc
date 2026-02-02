@@ -40,7 +40,7 @@
       // 开启鉴权后生效，用于存放密码的文件名，密码为 sha256 hex 格式
       "PASSWD_FILENAME": ".password",
       // Main frontend filename | 前端主文件名
-      "INDEX_FILENAME": "c.html"
+      "INDEX_FILENAME": "d.html"
     },
     // Proxy download keyword or URL. Can also be set via Cloudflare Secrets.
     // 代理下载关键词或 URL。也可以通过 Cloudflare Secrets 设置。
