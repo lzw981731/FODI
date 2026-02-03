@@ -108,7 +108,7 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': 'Content-Type',
           'Access-Control-Max-Age': '604800',
-          DAV: '1, 3',
+          DAV: '1, 2, 3',
           ALLOW: allowMethods.join(', '),
           'ms-author-via': 'DAV',
         },

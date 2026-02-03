@@ -293,7 +293,32 @@ async function handlePut(filePath: string, request: Request) {
 }
 
 async function handleLock() {
-  return { davXml: null, davStatus: 200 };
+  const token = `urn:uuid:${crypto.randomUUID()}`;
+  const davXml = `<?xml version="1.0" encoding="utf-8" ?>
+<D:prop xmlns:D="DAV:">
+  <D:lockdiscovery>
+    <D:activelock>
+      <D:locktype><D:write/></D:locktype>
+      <D:lockscope><D:exclusive/></D:lockscope>
+      <D:depth>infinity</D:depth>
+      <D:owner>
+        <D:href>Unknown</D:href>
+      </D:owner>
+      <D:timeout>Second-604800</D:timeout>
+      <D:locktoken>
+        <D:href>${token}</D:href>
+      </D:locktoken>
+    </D:activelock>
+  </D:lockdiscovery>
+</D:prop>`;
+
+  return {
+    davXml,
+    davStatus: 200,
+    davHeaders: {
+      'Lock-Token': `<${token}>`
+    }
+  };
 }
 
 async function handleUnlock() {
