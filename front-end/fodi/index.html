@@ -1852,12 +1852,17 @@
       const sortOrder = clickedElem.querySelector('i').className.includes('up') ? 'desc' : 'asc';
       const reverseFactor = sortOrder === 'asc' ? 1 : -1;
       loadedPages.orderby = `${sortField} ${sortOrder}`;
-      loadedPages.compare = (a, b) =>
-        reverseFactor *
-        a[sortField].toString().localeCompare(b[sortField].toString(), undefined, {
-          numeric: true,
-          sensitivity: 'base',
-        });
+      loadedPages.compare = (a, b) => {
+        // 文件夹优先逻辑：没有 url 的项视为文件夹
+        if (!a.url && b.url) return -1;
+        if (a.url && !b.url) return 1;
+
+        return reverseFactor *
+          a[sortField].toString().localeCompare(b[sortField].toString(), undefined, {
+            numeric: true,
+            sensitivity: 'base',
+          });
+      };
       if (!loadedPages.skipToken || window.GLOBAL_CONFIG.IS_BUSINESS) {
         renderFileList(loadedPages);
         return;
@@ -1903,6 +1908,15 @@
               return;
             }
             indicator.close();
+            // 在数据中注入文件夹优先的排序逻辑
+            const [f, o] = (orderby || 'lastModifiedDateTime desc').split(' ');
+            const rf = o === 'asc' ? 1 : -1;
+            data.orderby = orderby || 'lastModifiedDateTime desc';
+            data.compare = (a, b) => {
+              if (!a.url && b.url) return -1;
+              if (a.url && !b.url) return 1;
+              return rf * a[f].toString().localeCompare(b[f].toString(), undefined, { numeric: true, sensitivity: 'base' });
+            };
             renderPage(data);
           },
           fallback,
