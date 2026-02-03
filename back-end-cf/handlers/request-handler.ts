@@ -91,6 +91,8 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
     'POST',
     'PROPFIND',
     'PUT',
+    'LOCK',
+    'UNLOCK',
   ];
 
   if (!allowMethods.includes(request.method)) {

@@ -48,6 +48,8 @@ export async function handleWebdav(request: Request, env: Env, requestUrl: URL):
     MKCOL: () => davClient.handleMkcol(filePath),
     PUT: () => davClient.handlePut(filePath, request),
     PROPFIND: () => davClient.handlePropfind(filePath, parseDepth(request.headers.get('Depth'))),
+    LOCK: () => davClient.handleLock(),
+    UNLOCK: () => davClient.handleUnlock(),
   };
 
   const handler = handlers[request.method];

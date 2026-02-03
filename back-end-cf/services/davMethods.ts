@@ -12,6 +12,8 @@ export const davClient = {
   handleHead,
   handleMkcol,
   handlePut,
+  handleLock,
+  handleUnlock,
 };
 
 async function handlePropfind(filePath: string, depth: DavDepth) {
@@ -34,8 +36,8 @@ async function handlePropfind(filePath: string, depth: DavDepth) {
   const select = '?select=id,name,size,lastModifiedDateTime,file,@odata.etag';
   const reqUrl = new URL(
     savedData?.['@odata.nextLink'] ??
-      savedData?.['@odata.deltaLink'] ??
-      `${runtimeEnv.OAUTH.apiUrl}${itemPathWrapped}/children${select}&top=1000`,
+    savedData?.['@odata.deltaLink'] ??
+    `${runtimeEnv.OAUTH.apiUrl}${itemPathWrapped}/children${select}&top=1000`,
   );
   const reqEndpoint = (reqUrl.pathname + reqUrl.search).replace('v1.0', '');
 
@@ -165,10 +167,10 @@ async function handleHead(filePath: string) {
     davStatus: data?.folder ? 403 : resp.status,
     davHeaders: data?.file
       ? {
-          'Content-Length': data.size.toString(),
-          'Content-Type': data.file.mimeType,
-          'Last-Modified': new Date(data.lastModifiedDateTime).toUTCString(),
-        }
+        'Content-Length': data.size.toString(),
+        'Content-Type': data.file.mimeType,
+        'Last-Modified': new Date(data.lastModifiedDateTime).toUTCString(),
+      }
       : {},
   };
 }
@@ -288,4 +290,12 @@ async function handlePut(filePath: string, request: Request) {
   } finally {
     reader.releaseLock();
   }
+}
+
+async function handleLock() {
+  return { davXml: null, davStatus: 200 };
+}
+
+async function handleUnlock() {
+  return { davXml: null, davStatus: 204 };
 }
