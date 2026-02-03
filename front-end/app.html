@@ -461,6 +461,89 @@
       padding: 0 1.5rem;
       font-weight: 600;
       height: 100% !important;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .password button:hover {
+      background: #1d4ed8;
+    }
+
+    /* Modal / Popup Styling */
+    .modal-mask {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-content {
+      background: var(--surface);
+      padding: 2.5rem;
+      border-radius: var(--radius);
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      animation: slideUp 0.3s ease;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .modal-desc {
+      font-size: 0.875rem;
+      color: var(--text-sub);
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .modal-input-group input {
+      height: 45px !important;
+    }
+
+    .modal-input-group button {
+      height: 45px !important;
+      width: 100%;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
     /* Back to top */
@@ -1071,18 +1154,16 @@
 
     function handleEncryptedFolder(files) {
       switchRightDisplay('encrypted');
-      const password = document.querySelector('.password');
-      const input = password.querySelector('input');
-      const button = password.querySelector('button');
-      const buttonParent = button.parentElement;
-      const buttonClone = button.cloneNode(true);
-      buttonParent.replaceChild(buttonClone, button);
-      input.placeholder = '请输入密码';
-      buttonClone.addEventListener('click', (event) => {
+      const passwordWrapper = document.querySelector('.password-wrapper');
+      const input = passwordWrapper.querySelector('input');
+      const button = passwordWrapper.querySelector('button');
+
+      input.value = '';
+      input.placeholder = '请输入访问密码';
+
+      const handleSubmit = () => {
         const passwd = input.value;
-        if (!input.value) {
-          return;
-        }
+        if (!passwd) return;
         input.value = '';
         input.placeholder = '正在验证..';
         sendRequest(
@@ -1093,7 +1174,7 @@
           (data) => {
             const newFiles = JSON.parse(data);
             if (newFiles.encrypted) {
-              input.placeholder = '密码错误';
+              input.placeholder = '密码错误，请重试';
             } else {
               window.fileCache.set(newFiles.parent, newFiles);
               window.fileCache.set(`${newFiles.parent}/.password`, passwd);
@@ -1101,7 +1182,14 @@
             }
           },
         );
-      });
+      };
+
+      const newButton = button.cloneNode(true);
+      button.parentNode.replaceChild(newButton, button);
+      newButton.addEventListener('click', handleSubmit);
+      input.onkeydown = (e) => { if (e.key === 'Enter') handleSubmit(); };
+
+      input.focus();
     }
 
     function addPathListener(elem, path) {
@@ -2057,10 +2145,16 @@
           </div>
           <div class="content"></div>
         </div>
-        <div class="password-wrapper">
-          <div class="password">
-            <input type="password" />
-            <button>提交</button>
+        <div class="password-wrapper" data-hidden="1">
+          <div class="modal-mask">
+            <div class="modal-content">
+              <div class="modal-title">受保护的目录</div>
+              <div class="modal-desc">此文件夹已加密，请输入密码以访问内容</div>
+              <div class="modal-input-group password">
+                <input type="password" placeholder="请输入密码" />
+                <button>确认访问</button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="file-upload-wrapper">
