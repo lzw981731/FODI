@@ -18,9 +18,18 @@ export async function cacheRequest(
   }
 
   // WebDAV bypass
+  // 如果是 WebDAV 方法，直接跳过缓存逻辑，交给 handleRequest 处理
+  // 之前的逻辑只判断了 Authorization 头，可能不准确
+  const webdavMethods = ['PROPFIND', 'MKCOL', 'MOVE', 'COPY', 'DELETE', 'PUT', 'OPTIONS', 'HEAD', 'LOCK', 'UNLOCK'];
+  if (webdavMethods.includes(method)) {
+    return handleRequest(request, env);
+  }
+
   const cacheUrl = new URL(request.url);
   const isDavGetCache =
     env.PROTECTED.PROXY_KEYWORD && cacheUrl.hostname.includes(`${env.PROTECTED.PROXY_KEYWORD}.`);
+
+  // 对于 GET/POST 请求，如果带了 Authorization 且不是特定的 DavGetCache，也跳过缓存
   if (request.headers.get('Authorization') && !isDavGetCache) {
     return handleRequest(request, env);
   }
