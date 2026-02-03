@@ -1,1 +1,3 @@
-export const runtimeEnv = {} as any as Env;
+import { env as workerEnv } from 'cloudflare:workers';
+
+export const runtimeEnv = workerEnv;

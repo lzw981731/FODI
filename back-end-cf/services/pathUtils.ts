@@ -33,10 +33,8 @@ export function parsePath(filePath: string, prefixToRemove?: string, keepTrailin
  * @returns The constructed URI path.
  */
 export function buildUriPath(filePath: string, exposePath: string, apiUrl: string) {
-  let itemPath = (exposePath + parsePath(filePath).path).replace(/\/+/g, '/');
-  if (itemPath.startsWith('/')) {
-    itemPath = itemPath.slice(1);
-  }
+  const itemPath = exposePath + parsePath(filePath).path;
+  // if PROTECTED.EXPOSE_PATH + path equals to an empty string or ends with '/', ':' will lead to an error.
   const uri = itemPath
     ? `${apiUrl}:${itemPath.split('/').map(encodeURIComponent).join('/')}:`
     : apiUrl;
