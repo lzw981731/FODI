@@ -18,7 +18,7 @@ export async function handleWebdav(request: Request, env: Env, requestUrl: URL):
     });
   }
 
-  const proxyKeyword = env.PROXY_KEYWORD || env.PROTECTED.PROXY_KEYWORD;
+  const proxyKeyword = env.PROXY_KEYWORD || env.PROTECTED.PROXY_KEYWORD || '';
   const isUrlProxy = proxyKeyword.startsWith('http');
   const proxyPrefix = isUrlProxy ? new URL(proxyKeyword).pathname : `/${proxyKeyword}`;
 

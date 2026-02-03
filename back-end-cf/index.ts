@@ -38,7 +38,7 @@ export default {
     // 访问根目录 / 或其他路径，交回给后端的逻辑处理（保持原汁原味）
 
     try {
-      return cacheRequest(request, env, ctx);
+      return await cacheRequest(request, env, ctx);
     } catch (e: any) {
       return Response.json({ error: e.message });
     }
