@@ -18,7 +18,7 @@ export async function handleGetRequest(
   const isUrlProxy = proxyKeyword.startsWith('http');
   const proxyPrefix = isUrlProxy ? new URL(proxyKeyword).pathname : `/${proxyKeyword}`;
 
-  // 只有当 proxyKeyword 不为空且匹配前缀时，才认为是代理下载请求
+  // 如果设置了 proxyKeyword，则检查是否匹配该前缀，决定是否需要代理下载
   const isProxyRequest = !!(
     proxyKeyword &&
     (isUrlProxy
