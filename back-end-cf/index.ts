@@ -3,6 +3,10 @@ import { fetchAccessToken } from './services/fetchUtils';
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
+    // 关键修复：同步环境对象到全局，确保 services 下的文件能读到 PROXY_KEYWORD 等配置
+    const { runtimeEnv } = await import('./types/env');
+    Object.assign(runtimeEnv, env);
+
     const url = new URL(request.url);
 
     const indexFile = env.PROTECTED.INDEX_FILENAME || 'd.html';
@@ -10,9 +14,10 @@ export default {
 
     // 允许的列表页路径识别
     const isCustomPath = url.pathname === `/${indexFile}` || url.pathname === `/${indexBase}`;
-    const isDefaultPath = url.pathname === '/d.html' || url.pathname === '/d';
+    const isDefaultPath = url.pathname === '/' || url.pathname === '/d.html' || url.pathname === '/d';
 
-    if (isCustomPath || isDefaultPath) {
+    // 仅在 GET 请求时拦截并返回静态页面，保留 POST 给后端 API
+    if (request.method === 'GET' && (isCustomPath || isDefaultPath)) {
       // 1. 如果访问的是默认路径，但配置了自定义路径，则强制跳转到自定义路径（最高标准）
       if (isDefaultPath && indexFile !== 'd.html') {
         return Response.redirect(`${url.origin}/${indexFile}`, 301);
