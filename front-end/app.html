@@ -356,8 +356,17 @@
     }
 
     #file-list i {
-      font-size: 22px !important;
-      color: #7c8ea5;
+      font-size: 24px !important;
+      color: #2563eb;
+      /* 统一使用高级蓝色 */
+      width: 32px;
+      display: flex;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    #file-list .row:hover i {
+      transform: scale(1.1);
     }
 
     /* Upload Section */
@@ -907,11 +916,28 @@
         return [size.toFixed(2), `${['', 'K', 'M', 'G', 'T', 'P'][count]}B`];
       };
 
+      const getIconClass = (name, isFile) => {
+        if (!isFile) return 'zmdi-folder';
+        const suffix = name.split('.').pop().toLowerCase();
+        const map = {
+          apk: 'zmdi-android',
+          jpg: 'zmdi-image', jpeg: 'zmdi-image', png: 'zmdi-image', gif: 'zmdi-image', webp: 'zmdi-image',
+          mp4: 'zmdi-movie', mkv: 'zmdi-movie', avi: 'zmdi-movie', flv: 'zmdi-movie',
+          mp3: 'zmdi-audio', flac: 'zmdi-audio', wav: 'zmdi-audio',
+          pdf: 'zmdi-file-text',
+          zip: 'zmdi-archive', rar: 'zmdi-archive', '7z': 'zmdi-archive',
+          html: 'zmdi-code', css: 'zmdi-code', js: 'zmdi-code', py: 'zmdi-code',
+          txt: 'zmdi-file-text'
+        };
+        return map[suffix] || 'zmdi-file';
+      };
+
       const createFileWrapper = (type, name, time, size, path, url) => {
         const fileWrapper = document
           .getElementById('file-wrapper-template')
           .content.cloneNode(true);
-        fileWrapper.querySelector('i').className = `zmdi zmdi-${type}`;
+        const isFile = !!url;
+        fileWrapper.querySelector('i').className = `zmdi ${getIconClass(name, isFile)}`;
         fileWrapper.querySelector('.name').innerText = name;
         fileWrapper.querySelector('.lastModifiedDateTime').innerText = formatDate(time);
         [
