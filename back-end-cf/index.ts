@@ -10,7 +10,7 @@ export default {
 
     // 允许的列表页路径识别
     const isCustomPath = url.pathname === `/${indexFile}` || url.pathname === `/${indexBase}`;
-    const isDefaultPath = url.pathname === '/d.html' || url.pathname === '/d';
+    const isDefaultPath = url.pathname === '/' || url.pathname === '/d.html' || url.pathname === '/d';
 
     if (isCustomPath || isDefaultPath) {
       // 1. 如果访问的是默认路径，但配置了自定义路径，则强制跳转到自定义路径（最高标准）
