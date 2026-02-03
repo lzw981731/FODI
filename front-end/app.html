@@ -2131,6 +2131,19 @@
         preview: false,
       };
       window.fileCache = new Map();
+      // 密码 Session 持久化逻辑：确保刷新页面后密码依然有效，直到关闭浏览器
+      const savedPasswds = JSON.parse(sessionStorage.getItem('fodi_pass') || '{}');
+      Object.keys(savedPasswds).forEach(k => window.fileCache.set(k, savedPasswds[k]));
+      const originalSet = window.fileCache.set.bind(window.fileCache);
+      window.fileCache.set = (key, val) => {
+        if (typeof key === 'string' && key.endsWith('/.password')) {
+          const ps = JSON.parse(sessionStorage.getItem('fodi_pass') || '{}');
+          ps[key] = val;
+          sessionStorage.setItem('fodi_pass', JSON.stringify(ps));
+        }
+        return originalSet(key, val);
+      };
+
       window.resourceCache = Object.create(null);
       const initialPath =
         new URLSearchParams(window.location.search).get('path') || window.api.root;
@@ -2194,7 +2207,7 @@
         <div class="tree-node" style="margin-left:0; border-left:none; cursor:pointer;"
           onclick="fetchFileList(window.api.root); switchBackForwardStatus(window.api.root);">
           <i class="zmdi zmdi-folder"></i>
-          <div class="tree-node-name" style="font-weight:600;">主文件夹</div>
+          <div class="tree-node-name" style="font-weight:600;">Home</div>
         </div>
         <div id="tree-root"></div>
       </div>
