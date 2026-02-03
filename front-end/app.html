@@ -242,6 +242,36 @@
       font-size: 18px !important;
     }
 
+    /* Sidebar Navigation Arrows */
+    .sidebar-nav {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+      padding-left: 0.2rem;
+    }
+
+    .sidebar-nav i {
+      font-size: 20px !important;
+      cursor: pointer;
+      color: var(--text);
+      transition: var(--transition);
+      padding: 6px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-nav i:hover:not([disabled]) {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .sidebar-nav i[disabled] {
+      opacity: 0.2;
+      cursor: default;
+    }
+
     /* Right Main Panel - Files */
     .right {
       flex: 1;
@@ -1596,10 +1626,6 @@
     function addBackForwardListener() {
       document.getElementById('arrow-back').addEventListener('click', back);
       document.getElementById('arrow-forward').addEventListener('click', forward);
-      document.querySelector('#main-page').addEventListener('click', () => {
-        fetchFileList(window.api.root);
-        switchBackForwardStatus(window.api.root);
-      });
     }
 
     function addFileUploadListener() {
@@ -2152,19 +2178,17 @@
   </template>
   <div class="loading-indicator"></div>
   <div class="header-wrapper">
-    <div class="header">
-      <i id="arrow-back" disabled class="zmdi zmdi-arrow-left logo"></i>
-      <i id="arrow-forward" disabled class="zmdi zmdi-arrow-right logo"></i>
-      <i id="main-page" class="zmdi zmdi-folder logo"></i>
-      <div class="nav">
-        <span id="path"> </span>
-      </div>
+    <div class="header" style="justify-content: flex-end;">
       <span class="site" id="nav-site">ONEDRIVE</span>
     </div>
   </div>
   <div class="container">
     <div class="main" data-hidden="1">
       <div class="left">
+        <div class="sidebar-nav">
+          <i id="arrow-back" disabled class="zmdi zmdi-arrow-left"></i>
+          <i id="arrow-forward" disabled class="zmdi zmdi-arrow-right"></i>
+        </div>
         <div class="tree-node" style="margin-left:0; border-left:none; cursor:pointer;"
           onclick="fetchFileList(window.api.root); switchBackForwardStatus(window.api.root);">
           <i class="zmdi zmdi-folder"></i>
