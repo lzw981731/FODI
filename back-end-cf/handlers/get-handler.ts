@@ -32,7 +32,7 @@ export async function handleGetRequest(
   );
 
   if (!fileName) {
-    return new Response('Bad Request', { status: 400 });
+    return new Response('欢迎访问，这是一个html示范页，请上传代码', { status: 400 });
   } else if (fileName.toLowerCase() === env.PROTECTED.PASSWD_FILENAME.toLowerCase()) {
     return new Response('Access Denied', { status: 403 });
   } else if (
