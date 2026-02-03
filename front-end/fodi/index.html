@@ -494,7 +494,30 @@
       width: 90%;
       max-width: 420px;
       text-align: center;
+      position: relative;
       animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 20px !important;
+    }
+
+    .modal-close:hover {
+      background: var(--bg);
+      color: var(--text);
+      transform: rotate(90deg);
     }
 
     .modal-title {
@@ -517,10 +540,19 @@
     }
 
     .modal-input-group input {
-      height: 50px !important;
-      border-radius: 50px !important;
+      height: 58px !important;
+      border-radius: 16px !important;
       padding: 0 1.5rem !important;
-      border: 1.5px solid var(--border) !important;
+      border: 2px solid var(--border) !important;
+      font-size: 16px !important;
+      background: #fcfdfe !important;
+      transition: var(--transition);
+    }
+
+    .modal-input-group input:focus {
+      border-color: var(--primary) !important;
+      background: #fff !important;
+      box-shadow: 0 0 0 4px var(--primary-soft) !important;
     }
 
     .modal-input-group button {
@@ -1162,11 +1194,22 @@
     function handleEncryptedFolder(files) {
       switchRightDisplay('encrypted');
       const passwordWrapper = document.querySelector('.password-wrapper');
+      const mask = passwordWrapper.querySelector('.modal-mask');
+      const closeBtn = passwordWrapper.querySelector('.modal-close');
       const input = passwordWrapper.querySelector('input');
       const button = passwordWrapper.querySelector('button');
 
       input.value = '';
       input.placeholder = '请输入访问密码';
+
+      const handleClose = (e) => {
+        if (e.target === mask || (closeBtn && (e.currentTarget === closeBtn || e.target === closeBtn))) {
+          back();
+        }
+      };
+
+      mask.onclick = handleClose;
+      if (closeBtn) closeBtn.onclick = handleClose;
 
       const handleSubmit = () => {
         const passwd = input.value;
@@ -2155,6 +2198,7 @@
         <div class="password-wrapper" data-hidden="1">
           <div class="modal-mask">
             <div class="modal-content">
+              <i class="zmdi zmdi-close modal-close"></i>
               <div class="modal-title">受保护的目录</div>
               <div class="modal-desc">此文件夹已加密，请输入密码以访问内容</div>
               <div class="modal-input-group password">
