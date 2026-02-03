@@ -44,7 +44,7 @@
     },
     // Proxy download keyword or URL. Can also be set via Cloudflare Secrets.
     // 代理下载关键词或 URL。也可以通过 Cloudflare Secrets 设置。
-    "PROXY_KEYWORD": "",
+    "PROXY_KEYWORD": "dd.vipkj.workers.dev",
     // Method-based cache TTL (seconds) | 请求方法缓存时长（秒）
     // during this period, the OneDrive API will not be called again | 期间不再调用OneDrive API
     "CACHE_TTLMAP": {
