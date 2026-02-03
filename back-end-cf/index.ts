@@ -12,7 +12,7 @@ export default {
     const isCustomPath = url.pathname === `/${indexFile}` || url.pathname === `/${indexBase}`;
     const isDefaultPath = url.pathname === '/' || url.pathname === '/d.html' || url.pathname === '/d';
 
-    if (isCustomPath || isDefaultPath) {
+    if (request.method === 'GET' && (isCustomPath || isDefaultPath)) {
       // 1. 如果访问的是默认路径，但配置了自定义路径，则强制跳转到自定义路径（最高标准）
       if (isDefaultPath && indexFile !== 'd.html') {
         return Response.redirect(`${url.origin}/${indexFile}`, 301);
