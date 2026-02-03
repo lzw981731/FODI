@@ -856,6 +856,9 @@
     }
 
     function renderPath(path) {
+      const pathSpanWrapper = document.getElementById('path');
+      if (!pathSpanWrapper) return; // 防止因移除 id="path" 导致崩溃
+
       const createPathSpan = (text, path) => {
         const pathSpan = document.createElement('span');
         pathSpan.innerHTML = text.length > 20 ? text.substring(0, 20) + '..' : text;
@@ -867,7 +870,6 @@
       };
 
       const paths = path.split('/');
-      const pathSpanWrapper = document.getElementById('path');
       pathSpanWrapper.innerHTML = '';
       pathSpanWrapper.appendChild(createPathSpan(window.api.root));
       let continualPath = '/';
