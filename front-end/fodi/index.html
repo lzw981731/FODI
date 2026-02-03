@@ -1675,7 +1675,7 @@
         document.querySelector('.file-upload-progress').dataset.hidden = '1';
         document.querySelector('.file-upload-wrapper').dataset.hidden = '0';
       } else if (display === 'list') {
-        const sortOrder = window.fileCache.get(window.backForwardCache.current)?.orderby;
+        const sortOrder = window.fileCache.get(window.backForwardCache.current)?.orderby || 'lastModifiedDateTime desc';
         document.querySelectorAll('.list-header .row .file > div').forEach((field) => {
           const indicator = field.querySelector('i');
           if (new RegExp(field.className, 'i').test(sortOrder)) {
@@ -1866,7 +1866,7 @@
       fetchFileList(loadedPages.parent, loadedPages.orderby);
     }
 
-    function fetchFileList(path, orderby) {
+    function fetchFileList(path, orderby = 'lastModifiedDateTime desc') {
       // console.log('fetching ' + path);
       window.backForwardCache.preview = false;
       window.backForwardCache.current = path;
@@ -2147,7 +2147,7 @@
       window.resourceCache = Object.create(null);
       const initialPath =
         new URLSearchParams(window.location.search).get('path') || window.api.root;
-      fetchFileList(initialPath);
+      fetchFileList(initialPath, 'lastModifiedDateTime desc');
       addBackForwardListener();
       addFileUploadListener();
       addBackToTopListener();
