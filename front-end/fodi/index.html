@@ -887,15 +887,6 @@
       const children = [];
       const parent = page.parent === window.api.root ? '' : page.parent;
 
-      // 如果当前不在根目录，则在列表最上方添加“主文件夹”入口
-      if (parent) {
-        children.push({
-          name: '主文件夹',
-          lastModifiedDateTime: new Date().toISOString(),
-          size: 0,
-          toFragment: () => createFileWrapper('folder', '主文件夹', new Date().toISOString(), 0, window.api.root, null)
-        });
-      }
       page.files.forEach((file) => {
         // Only load readme not all .md files for performance reason.
         if (file.name.toLowerCase() === 'readme.md') {
@@ -2168,6 +2159,11 @@
   <div class="container">
     <div class="main" data-hidden="1">
       <div class="left">
+        <div class="tree-node" style="margin-left:0; border-left:none; cursor:pointer;"
+          onclick="fetchFileList(window.api.root); switchBackForwardStatus(window.api.root);">
+          <i class="zmdi zmdi-folder"></i>
+          <div class="tree-node-name" style="font-weight:600;">主文件夹</div>
+        </div>
         <div id="tree-root"></div>
       </div>
       <div class="right">
