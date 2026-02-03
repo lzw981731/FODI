@@ -14,15 +14,16 @@ export async function handleGetRequest(
   }
 
   // download files
-  const proxyKeyword = env.PROXY_KEYWORD || env.PROTECTED.PROXY_KEYWORD;
+  const proxyKeyword = env.PROXY_KEYWORD || env.PROTECTED.PROXY_KEYWORD || '';
   const isUrlProxy = proxyKeyword.startsWith('http');
   const proxyPrefix = isUrlProxy ? new URL(proxyKeyword).pathname : `/${proxyKeyword}`;
 
+  // 只有当 proxyKeyword 不为空且匹配前缀时，才认为是代理下载请求
   const isProxyRequest = !!(
     proxyKeyword &&
     (isUrlProxy
       ? requestUrl.href.startsWith(proxyKeyword)
-      : requestUrl.pathname.startsWith(proxyPrefix))
+      : (proxyPrefix !== '/' && requestUrl.pathname.startsWith(proxyPrefix)))
   );
 
   const { path: filePath, tail: fileName } = parsePath(
